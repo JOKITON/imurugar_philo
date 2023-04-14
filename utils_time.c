@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils_time.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jaizpuru <jaizpuru@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jaizpuru <jaizpuru@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/12 13:57:24 by jaizpuru          #+#    #+#             */
-/*   Updated: 2023/04/12 14:13:29 by jaizpuru         ###   ########.fr       */
+/*   Updated: 2023/04/14 15:28:41 by jaizpuru         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,15 +20,15 @@ int	ft_atomic(long ms, int philos, t_philo	*phil)
 	if (philos > 150)
 		while (ft_diff((timer.tv_sec * 1000) + (timer.tv_usec / 1000)) < ms
 			&& !is_dead(phil))
-			usleep(ms * (philos / ms));
+			usleep(750);
 	else if (philos > 75 && philos <= 150)
 		while (ft_diff((timer.tv_sec * 1000) + (timer.tv_usec / 1000)) < ms
 			&& !is_dead(phil))
-			usleep(ms * (philos * 3 / ms));
+			usleep(500);
 	else
 		while (ft_diff((timer.tv_sec * 1000) + (timer.tv_usec / 1000)) < ms
 			&& !is_dead(phil))
-			usleep(ms / (ms / philos));
+			usleep(250);
 	return (0);
 }
 
