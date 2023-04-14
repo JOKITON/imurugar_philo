@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jaizpuru <jaizpuru@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jaizpuru <jaizpuru@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/21 13:33:19 by jaizpuru          #+#    #+#             */
-/*   Updated: 2023/04/13 16:20:10 by jaizpuru         ###   ########.fr       */
+/*   Updated: 2023/04/14 15:30:35 by jaizpuru         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,7 +95,7 @@ void	*thread_routine(void *data)
 	phil = (t_philo *)data;
 	phil->t_death = ft_diff(phil->back->time) + phil->back->t_die;
 	if (phil->id % 2 && phil->back->n_philo != 1)
-		ft_atomic(phil->back->t_eat, phil->back->n_philo, phil);
+		ft_atomic(phil->back->t_eat / 2, phil->back->n_philo, phil);
 	philo_routine(phil);
 	return (NULL);
 }
