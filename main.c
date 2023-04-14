@@ -12,20 +12,10 @@
 
 #include "philo.h"
 
-void	print_args(t_data	*data)
-{
-	printf("				START TIME -> %ld\n", data->time);
-	printf("				PHILOSOPHERS -> %d\n", data->n_philo);
-	printf("				TME TO DIE -> %ld\n", data->t_die);
-	printf("				TME TO EAT -> %ld\n", data->t_sleep);
-	printf("				TME TO SLEEP -> %ld\n", data->t_eat);
-	if (data->n_times_eat != -1)
-		printf("				TMES TO EAT -> %d\n", data->n_times_eat);
-}
-
 int	get_args(t_data	*data, char	**args)
 {
 	pthread_mutex_init(&data->print, NULL);
+	pthread_mutex_init(&data->death, NULL);
 	data->n_philo = ft_atoi(args[1]);
 	data->forks = data->n_philo;
 	data->philo = (t_philo *)malloc(sizeof(t_philo) * data->n_philo);
@@ -46,51 +36,40 @@ int	get_args(t_data	*data, char	**args)
 	}
 	else
 		data->n_times_eat = -1;
-	data->n_times_eat_checker = 0;
+	data->shared_fork = malloc(sizeof(char) * data->n_philo);
 	return (EXIT_SUCCESS);
 }
 
-void	end_philo(t_data	*data)
+int	join_threads(t_data *data)
 {
 	int	i;
 
-	i = 0;
-	if (data->n_philo > 1)
+	i = -1;
+	while (++i < data->n_philo)
 	{
-		while (!is_dead(&data->philo[1]))
-			if (data->check == TRUE)
-				break ;
+		if (pthread_join(data->philo[i].thread, NULL) != 0)
+		{
+			printf("Thread join failed at philos\n");
+			return (0);
+		}
 	}
-	else
-	{
-		while (!is_dead(&data->philo[0]))
-			if (data->check == TRUE)
-				break ;
-	}
-	while (i < data->n_philo)
-	{
-		destroy_mutexes(&data->philo[i]);
-		pthread_detach(data->philo[i++].thread);
-	}
+	return (1);
 }
 
-int	get_philo(t_data	*data)
+int	get_philo(t_data *data)
 {
 	int	i;
 
 	i = 0;
-	pthread_mutex_lock(&data->print);
+	init_philos(data);
 	while (i < data->n_philo)
 	{
-		init_philo(data, i);
 		if (pthread_create(&data->philo[i].thread, NULL, thread_routine,
 				&(data->philo[i])) != 0)
 			return (EXIT_FAILURE);
 		i++;
 	}
-	pthread_mutex_unlock(&data->print);
-	usleep(1000);
-	end_philo(data);
+	join_threads(data);
 	return (EXIT_SUCCESS);
 }
 
@@ -100,12 +79,13 @@ int	main(int argc, char	**argv)
 
 	if (argc < 5 || argc > 6)
 	{
-		write(2, "Error\n", 7);
+		printf("Error\n");
 		return (EXIT_FAILURE);
 	}
 	if (get_args(&data, argv) != 0)
-		return (write(2, "Error\n", 7));
+		return (printf("Error\n"));
 	if (get_philo(&data) == 1)
-		return (write(2, "Thread creation failed\n", 25));
-	free(data.philo);
+		return (printf("Thread creation failed\n"));
+	clear_all(&data);
+	return (EXIT_SUCCESS);
 }

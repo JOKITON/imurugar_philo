@@ -12,47 +12,21 @@
 
 #include "philo.h"
 
-void	wait_for_eats(t_philo	*phil, pthread_mutex_t	*p_right_fork)
+void	init_philos(t_data	*data)
 {
-	phil->n_eats++;
-	if (phil->back->n_times_eat != -1
-		&& phil->n_eats == phil->back->n_times_eat)
+	int	pos;
+
+	pos = 0;
+	while (pos < data->n_philo)
 	{
-		pthread_mutex_unlock(&phil->back->philo[phil->id - 1].fork);
-		pthread_mutex_unlock(p_right_fork);
-		pthread_mutex_lock(&phil->death);
-		phil->back->n_times_eat_checker++;
-		while (phil->back->n_times_eat_checker != phil->back->n_philo)
-			;
-		pthread_mutex_unlock(&phil->death);
-		phil->back->check = TRUE;
-		return ;
+		pthread_mutex_init(&data->philo[pos].fork, NULL);
+		data->philo[pos].id = pos + 1;
+		data->philo[pos].n_eats = 0;
+		data->philo[pos].back = data;
+		data->philo[pos].forks_in_hand = 0;
+		data->shared_fork[pos] = 0;
+		pos++;
 	}
-}
-
-void	print_macro(int macro, t_philo	*philo)
-{
-	pthread_mutex_lock(&philo->back->print);
-	if (macro == 1)
-		printf("%ldms %d has taken a fork\n",
-			ft_diff(philo->back->time), philo->id);
-	else if (macro == 2)
-		printf("%ldms %d is eating\n", ft_diff(philo->back->time), philo->id);
-	else if (macro == 3)
-		printf("%ldms %d is sleeping\n", ft_diff(philo->back->time), philo->id);
-	else if (macro == 4)
-		printf("%ldms %d is thinking\n", ft_diff(philo->back->time), philo->id);
-	pthread_mutex_unlock(&philo->back->print);
-}
-
-void	init_philo(t_data	*data, int pos)
-{
-	pthread_mutex_init(&data->philo[pos].death, NULL);
-	pthread_mutex_init(&data->philo[pos].fork, NULL);
-	pthread_mutex_init(&data->philo[pos].sleep, NULL);
-	data->philo[pos].id = pos + 1;
-	data->philo[pos].n_eats = 0;
-	data->philo[pos].back = data;
 }
 
 int	ft_atoi(const char *str)
