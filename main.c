@@ -6,7 +6,7 @@
 /*   By: jaizpuru <jaizpuru@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/21 11:18:21 by hedgedog          #+#    #+#             */
-/*   Updated: 2023/04/14 15:28:28 by jaizpuru         ###   ########.fr       */
+/*   Updated: 2023/04/14 18:03:11 by jaizpuru         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,23 +55,16 @@ void	end_philo(t_data	*data)
 	int	i;
 
 	i = 0;
-	if (data->n_philo > 1)
-	{
-		while (!is_dead(&data->philo[1]))
-			if (data->check == TRUE)
-				break ;
-	}
-	else
-	{
-		while (!is_dead(&data->philo[0]))
-			if (data->check == TRUE)
-				break ;
-	}
+	while (data->check == FALSE)
+		;
+	pthread_mutex_init(&data->print, NULL);
+	pthread_mutex_lock(&data->print);
 	while (i < data->n_philo)
 	{
 		destroy_mutexes(&data->philo[i]);
 		pthread_detach(data->philo[i++].thread);
 	}
+	pthread_mutex_unlock(&data->print);
 }
 
 int	get_philo(t_data	*data)
@@ -89,7 +82,6 @@ int	get_philo(t_data	*data)
 		i++;
 	}
 	pthread_mutex_unlock(&data->print);
-	usleep(1000);
 	end_philo(data);
 	return (EXIT_SUCCESS);
 }

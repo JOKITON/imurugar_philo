@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jaizpuru <jaizpuru@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jaizpuru <jaizpuru@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/27 10:36:55 by jaizpuru          #+#    #+#             */
-/*   Updated: 2023/04/13 16:16:54 by jaizpuru         ###   ########.fr       */
+/*   Updated: 2023/04/14 17:57:28 by jaizpuru         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ void	wait_for_eats(t_philo	*phil, pthread_mutex_t	*p_right_fork)
 		&& phil->n_eats == phil->back->n_times_eat)
 	{
 		pthread_mutex_unlock(&phil->back->philo[phil->id - 1].fork);
-		pthread_mutex_unlock(p_right_fork);
-		pthread_mutex_lock(&phil->death);
 		phil->back->n_times_eat_checker++;
+		pthread_mutex_unlock(p_right_fork);
 		while (phil->back->n_times_eat_checker != phil->back->n_philo)
 			;
-		pthread_mutex_unlock(&phil->death);
+		pthread_mutex_lock(&phil->back->print);
 		phil->back->check = TRUE;
+		pthread_mutex_unlock(&phil->back->print);
 		return ;
 	}
 }

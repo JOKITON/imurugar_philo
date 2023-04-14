@@ -6,7 +6,7 @@
 /*   By: jaizpuru <jaizpuru@student.42urduliz.co    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/21 13:33:19 by jaizpuru          #+#    #+#             */
-/*   Updated: 2023/04/14 15:30:35 by jaizpuru         ###   ########.fr       */
+/*   Updated: 2023/04/14 18:04:38 by jaizpuru         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,30 +16,24 @@ void	destroy_mutexes(t_philo	*philo)
 {
 	pthread_mutex_destroy(&philo->sleep);
 	pthread_mutex_destroy(&philo->fork);
-	pthread_mutex_destroy(&philo->death);
 }
 
 int	is_dead(t_philo	*philo)
 {
-	pthread_mutex_lock(&philo->death);
-	if (!philo->t_death || !philo->back->time)
-		return (0);
 	if (ft_diff(philo->back->time) >= (philo->t_death)
-		&& !philo->back->check)
+		&& philo->back->check == FALSE)
 	{
-		pthread_mutex_lock(&philo->back->print);
 		philo->back->check = TRUE;
+		pthread_mutex_lock(&philo->back->print);
 		printf("%ldms %d died\n", ft_diff(philo->back->time), philo->id);
 		pthread_mutex_unlock(&philo->back->print);
-		pthread_mutex_unlock(&philo->death);
 		pthread_mutex_destroy(&philo->back->print);
 		return (1);
 	}
-	pthread_mutex_unlock(&philo->death);
 	return (0);
 }
 
-void	*ft_kitchen(t_philo	*phil)
+void	ft_kitchen(t_philo	*phil)
 {
 	pthread_mutex_t	*right_fork;
 
@@ -48,8 +42,8 @@ void	*ft_kitchen(t_philo	*phil)
 	else
 		right_fork = &(phil->back->philo[phil->id].fork);
 	pthread_mutex_lock(&phil->back->philo[phil->id - 1].fork);
-	if (ft_diff(phil->back->time) >= (phil->t_death))
-		return (right_fork);
+	if (is_dead(phil))
+		return ;
 	print_macro(FORK, phil);
 	pthread_mutex_lock(right_fork);
 	print_macro(FORK, phil);
@@ -60,25 +54,16 @@ void	*ft_kitchen(t_philo	*phil)
 		wait_for_eats(phil, right_fork);
 	pthread_mutex_unlock(right_fork);
 	pthread_mutex_unlock(&phil->back->philo[phil->id - 1].fork);
-	return (NULL);
 }
 
 void	philo_routine(t_philo	*phil)
 {
-	if (phil->back->n_philo == 1)
+	while (!is_dead(phil))
 	{
-		printf("%ldms %d has taken a fork\n", ft_diff(phil->back->time),
-			phil->id);
-		while (1)
-			;
-	}
-	while (!is_dead(phil) && !phil->back->check)
-	{
-		if (ft_kitchen(phil) != NULL)
-			return ;
-		pthread_mutex_lock(&phil->sleep);
+		ft_kitchen(phil);
 		if (phil->back->check)
 			return ;
+		pthread_mutex_lock(&phil->sleep);
 		printf("%ldms %d is sleeping\n", ft_diff(phil->back->time), phil->id);
 		ft_atomic((long)phil->back->t_sleep, phil->back->n_philo, phil);
 		pthread_mutex_unlock(&phil->sleep);
