@@ -44,10 +44,12 @@ int	ft_atoi(const char *str)
 	if (str[loop] == '-' || str[loop] == '+')
 		if (str[loop++] == '-')
 			negative = -negative;
-	while (str[loop] >= '0' && str[loop] <= '9')
+	while (str[loop])
 	{
-		box = (box * 10) + str[loop] - '0';
-		loop++;
+  if (str[loop] < '0' || str[loop] > '9')
+   return (0)
+  box = (box * 10) + str[loop] - '0';
+	 loop++;
 	}
 	return ((int)(box * negative));
 }
